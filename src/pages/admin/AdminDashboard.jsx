@@ -44,6 +44,7 @@ export default function AdminDashboard() {
     const [saving, setSaving] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [userCount, setUserCount] = useState(0)
+    const [users, setUsers] = useState([])
 
     useEffect(() => {
         const load = async () => {
@@ -53,17 +54,19 @@ export default function AdminDashboard() {
             )
 
             try {
-                const [rests, revs, uCount] = await Promise.race([
+                const [rests, revs, uCount, uList] = await Promise.race([
                     Promise.all([
                         restaurantService.getRestaurants(),
                         reviewService.getAllReviews(),
                         authService.getUserCount(),
+                        authService.getAllUsers(),
                     ]),
                     timeoutPromise
                 ])
                 setRestaurants(rests.length > 0 ? rests : mockRestaurants)
                 setReviews(revs)
                 setUserCount(uCount)
+                setUsers(uList)
             } catch (err) {
                 console.error('Admin: fetch error or timeout:', err.message)
                 setRestaurants(mockRestaurants)
@@ -83,13 +86,16 @@ export default function AdminDashboard() {
         if (!form.name.trim()) { toast.error('Name is required'); return }
         setSaving(true)
         try {
+            // Clean the form data: Remove joined properties that are not columns
+            const { featured_by_profile, avg_rating, total_reviews, ...cleanForm } = form
+            
             if (editTarget) {
-                const updated = await restaurantService.updateRestaurant(editTarget, form)
+                const updated = await restaurantService.updateRestaurant(editTarget, cleanForm)
                 setRestaurants(p => p.map(r => r.id === editTarget ? updated : r))
                 updateRestaurant(updated)
                 toast.success('Restaurant updated!')
             } else {
-                const created = await restaurantService.createRestaurant(form)
+                const created = await restaurantService.createRestaurant(cleanForm)
                 setRestaurants(p => [created, ...p])
                 addRestaurant(created)
                 toast.success('Restaurant added!')
@@ -127,12 +133,28 @@ export default function AdminDashboard() {
 
     const toggleFeatured = async (id, current) => {
         try {
-            const updated = await restaurantService.updateRestaurant(id, { featured: !current })
+            const updates = { 
+                featured: !current,
+                featured_by: !current ? profile.id : null 
+            }
+            const updated = await restaurantService.updateRestaurant(id, updates)
             setRestaurants(p => p.map(r => r.id === id ? updated : r))
             updateRestaurant(updated)
             toast.success(`Featured ${!current ? 'Enabled' : 'Disabled'}`)
         } catch (err) {
             toast.error(err.message || 'Failed to toggle')
+        }
+    }
+
+    const handleDeleteUser = async (id) => {
+        if (!confirm('Are you sure you want to delete this user? All their reviews and reservations will be lost.')) return
+        try {
+            await authService.deleteUser(id)
+            setUsers(p => p.filter(u => u.id !== id))
+            setUserCount(p => p - 1)
+            toast.success('User deleted successfully')
+        } catch (err) {
+            toast.error(err.message || 'Failed to delete user')
         }
     }
 
@@ -185,7 +207,7 @@ export default function AdminDashboard() {
 
                 {/* Tabs */}
                 <div className="flex gap-1 bg-dark-900 border border-dark-800 rounded-xl p-1 w-fit">
-                    {['restaurants', 'reviews'].map(tab => (
+                    {['restaurants', 'reviews', 'featured', 'users'].map(tab => (
                         <button key={tab} onClick={() => setActiveTab(tab)}
                             className={`px-5 py-2 rounded-lg text-sm font-medium capitalize transition-all ${activeTab === tab ? 'bg-brand-500 text-white' : 'text-dark-400 hover:text-white'
                                 }`}>
@@ -371,6 +393,97 @@ export default function AdminDashboard() {
                                             <td className="px-4 py-3 text-dark-400 text-xs max-w-xs truncate">{r.comment}</td>
                                             <td className="px-4 py-3">
                                                 <button onClick={() => handleDeleteReview(r.id)}
+                                                    className="p-1.5 rounded-lg bg-dark-800 hover:bg-red-500/20 text-dark-400 hover:text-red-400 transition-colors">
+                                                    <Trash2 size={13} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Featured Table */}
+                {activeTab === 'featured' && (
+                    <div className="card overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-dark-800/50 border-b border-dark-700">
+                                    <tr>
+                                        {['Name', 'Location', 'Rating', 'Featured By', 'Actions'].map(h => (
+                                            <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">{h}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-dark-800">
+                                    {restaurants.filter(r => r.featured).length === 0 ? (
+                                        <tr><td colSpan={4} className="px-4 py-10 text-center text-dark-400 text-sm">No featured restaurants found</td></tr>
+                                    ) : restaurants.filter(r => r.featured).map(r => (
+                                        <tr key={r.id} className="hover:bg-dark-800/30 transition-colors">
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    {r.image_url && <img src={r.image_url} alt="" className="w-8 h-8 rounded object-cover" />}
+                                                    <span className="text-white font-medium text-sm">{r.name}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-dark-400 text-sm">{r.location}</td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-1">
+                                                    <Star size={11} className="text-amber-400 fill-amber-400" />
+                                                    <span className="text-white text-sm">{Number(r.avg_rating || 0).toFixed(1)}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-dark-400 text-sm">
+                                                {r.featured_by_profile?.name || 'Admin'}
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-2">
+                                                    <button onClick={() => toggleFeatured(r.id, true)}
+                                                        className="p-2 rounded-lg bg-brand-500/10 hover:bg-brand-500 text-brand-400 hover:text-white transition-all border border-brand-500/20"
+                                                        title="Revoke Featured">
+                                                        <Star size={14} className="fill-current" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* Users Table */}
+                {activeTab === 'users' && (
+                    <div className="card overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-dark-800/50 border-b border-dark-700">
+                                    <tr>
+                                        {['User', 'Email', 'Joined', 'Actions'].map(h => (
+                                            <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-dark-400 uppercase tracking-wider">{h}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-dark-800">
+                                    {users.length === 0 ? (
+                                        <tr><td colSpan={4} className="px-4 py-10 text-center text-dark-400 text-sm">No users found</td></tr>
+                                    ) : users.map(u => (
+                                        <tr key={u.id} className="hover:bg-dark-800/30 transition-colors">
+                                            <td className="px-4 py-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-dark-800 border border-dark-700 flex items-center justify-center text-dark-400">
+                                                        {u.avatar_url ? <img src={u.avatar_url} alt="" className="w-full h-full rounded-full object-cover" /> : <Users size={14} />}
+                                                    </div>
+                                                    <span className="text-white font-medium text-sm">{u.name || 'Anonymous'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-dark-400 text-sm">{u.email}</td>
+                                            <td className="px-4 py-3 text-dark-400 text-sm">{new Date(u.created_at).toLocaleDateString()}</td>
+                                            <td className="px-4 py-3">
+                                                <button onClick={() => handleDeleteUser(u.id)}
                                                     className="p-1.5 rounded-lg bg-dark-800 hover:bg-red-500/20 text-dark-400 hover:text-red-400 transition-colors">
                                                     <Trash2 size={13} />
                                                 </button>

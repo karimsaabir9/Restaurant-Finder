@@ -1,11 +1,16 @@
 import { supabase } from '../lib/supabase'
 
 export const restaurantService = {
+    SELECT_STRING: `
+        *,
+        featured_by_profile:profiles!featured_by(name)
+    `,
+
     // Get all restaurants with optional filters
     async getRestaurants({ search = '', category = '', sortBy = 'created_at' } = {}) {
         let query = supabase
             .from('restaurants')
-            .select('*')
+            .select(restaurantService.SELECT_STRING)
             .order(sortBy, { ascending: false })
 
         if (search) {
@@ -24,7 +29,7 @@ export const restaurantService = {
     async getRestaurantById(id) {
         const { data, error } = await supabase
             .from('restaurants')
-            .select('*')
+            .select(restaurantService.SELECT_STRING)
             .eq('id', id)
             .single()
         if (error) throw error
@@ -35,7 +40,7 @@ export const restaurantService = {
     async getFeaturedRestaurants() {
         const { data, error } = await supabase
             .from('restaurants')
-            .select('*')
+            .select(restaurantService.SELECT_STRING)
             .eq('featured', true)
             .order('created_at', { ascending: false })
             .limit(8)
@@ -48,7 +53,7 @@ export const restaurantService = {
         const { data, error } = await supabase
             .from('restaurants')
             .insert([restaurant])
-            .select()
+            .select(restaurantService.SELECT_STRING)
             .single()
         if (error) throw error
         return data
@@ -60,7 +65,7 @@ export const restaurantService = {
             .from('restaurants')
             .update({ ...updates, updated_at: new Date().toISOString() })
             .eq('id', id)
-            .select()
+            .select(restaurantService.SELECT_STRING)
             .single()
         if (error) throw error
         return data

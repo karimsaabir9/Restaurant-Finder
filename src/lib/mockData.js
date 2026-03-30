@@ -1,7 +1,7 @@
 // Mock restaurant data for fallback when Supabase is not configured
 export const mockRestaurants = [
     {
-        id: '1',
+        id: '550e8400-e29b-41d4-a716-446655440001',
         name: 'The Golden Fork',
         description: 'Fine dining experience with exquisite French cuisine in an elegant setting. Our award-winning chef brings the best of Paris to your plate.',
         image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop',
@@ -18,7 +18,7 @@ export const mockRestaurants = [
         featured: true,
     },
     {
-        id: '2',
+        id: '550e8400-e29b-41d4-a716-446655440002',
         name: 'Spice Garden',
         description: 'Authentic Indian cuisine with bold flavors and vibrant spices. Experience the rich tapestry of Indian cooking traditions.',
         image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&auto=format&fit=crop',
@@ -34,7 +34,7 @@ export const mockRestaurants = [
         featured: true,
     },
     {
-        id: '3',
+        id: '550e8400-e29b-41d4-a716-446655440003',
         name: 'The Burger Lab',
         description: 'Gourmet burgers crafted with premium ingredients and house-made secret sauces. Bold flavors, massive portions.',
         image_url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop',
@@ -50,7 +50,7 @@ export const mockRestaurants = [
         featured: true,
     },
     {
-        id: '4',
+        id: '550e8400-e29b-41d4-a716-446655440004',
         name: 'Sakura Sushi',
         description: 'Traditional Japanese sushi and sashimi made with the freshest fish by master chefs trained in Osaka.',
         image_url: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=800&auto=format&fit=crop',
@@ -66,7 +66,7 @@ export const mockRestaurants = [
         featured: true,
     },
     {
-        id: '5',
+        id: '550e8400-e29b-41d4-a716-446655440005',
         name: 'La Piazza',
         description: 'Rustic Italian trattoria serving homemade pasta and wood-fired pizza just like Nonna used to make in Rome.',
         image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop',
@@ -82,7 +82,7 @@ export const mockRestaurants = [
         featured: false,
     },
     {
-        id: '6',
+        id: '550e8400-e29b-41d4-a716-446655440006',
         name: 'Ocean Blue',
         description: 'Fresh seafood caught daily in a nautical-themed atmosphere. Lobster, shrimp, and seasonal catches prepared to perfection.',
         image_url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&auto=format&fit=crop',
@@ -98,7 +98,7 @@ export const mockRestaurants = [
         featured: false,
     },
     {
-        id: '7',
+        id: '550e8400-e29b-41d4-a716-446655440007',
         name: 'Taco Loco',
         description: 'Authentic Mexican street food with bold flavors, fresh ingredients, and a lively atmosphere you will love.',
         image_url: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop',
@@ -114,7 +114,7 @@ export const mockRestaurants = [
         featured: false,
     },
     {
-        id: '8',
+        id: '550e8400-e29b-41d4-a716-446655440008',
         name: 'The Rooftop Cafe',
         description: 'Stunning skyline views paired with modern American cuisine. An unforgettable dining experience high above the city.',
         image_url: 'https://images.unsplash.com/photo-1592861956120-e524fc739696?w=800&auto=format&fit=crop',
@@ -132,10 +132,10 @@ export const mockRestaurants = [
 ]
 
 export const mockReviews = [
-    { id: 'r1', restaurant_id: '1', rating: 5, comment: 'Absolutely outstanding! The best French food I have had outside of Paris.', created_at: '2024-01-15T10:00:00Z', profiles: { name: 'Sarah M.', avatar_url: null } },
-    { id: 'r2', restaurant_id: '1', rating: 4, comment: 'Excellent food and ambiance. A bit pricey but worth every penny.', created_at: '2024-01-10T10:00:00Z', profiles: { name: 'James K.', avatar_url: null } },
-    { id: 'r3', restaurant_id: '2', rating: 5, comment: 'The butter chicken is divine! Perfectly spiced and incredibly creamy.', created_at: '2024-01-12T10:00:00Z', profiles: { name: 'Priya S.', avatar_url: null } },
-    { id: 'r4', restaurant_id: '3', rating: 5, comment: 'Best burgers in NYC, hands down. The truffle fries are a must!', created_at: '2024-01-08T10:00:00Z', profiles: { name: 'Mike L.', avatar_url: null } },
+    { id: 'r1', restaurant_id: '550e8400-e29b-41d4-a716-446655440001', rating: 5, comment: 'Absolutely outstanding! The best French food I have had outside of Paris.', created_at: '2024-01-15T10:00:00Z', profiles: { name: 'Sarah M.', avatar_url: null } },
+    { id: 'r2', restaurant_id: '550e8400-e29b-41d4-a716-446655440001', rating: 4, comment: 'Excellent food and ambiance. A bit pricey but worth every penny.', created_at: '2024-01-10T10:00:00Z', profiles: { name: 'Sarah M.', avatar_url: null } },
+    { id: 'r3', restaurant_id: '550e8400-e29b-41d4-a716-446655440002', rating: 5, comment: 'The butter chicken is divine! Perfectly spiced and incredibly creamy.', created_at: '2024-01-12T10:00:00Z', profiles: { name: 'Priya S.', avatar_url: null } },
+    { id: 'r4', restaurant_id: '550e8400-e29b-41d4-a716-446655440003', rating: 5, comment: 'Best burgers in NYC, hands down. The truffle fries are a must!', created_at: '2024-01-08T10:00:00Z', profiles: { name: 'Mike L.', avatar_url: null } },
 ]
 
 export const categories = ['All', 'Fine Dining', 'Restaurant', 'Casual', 'Seafood', 'Cafe', 'Fast Food', 'Bakery']

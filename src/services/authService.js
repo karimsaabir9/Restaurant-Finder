@@ -76,6 +76,24 @@ export const authService = {
         }
     },
 
+    // Get all users (regular users only)
+    async getAllUsers() {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('role', 'user')
+            .order('created_at', { ascending: false })
+        if (error) throw error
+        return data || []
+    },
+
+    // Delete a user account fully (Admin only)
+    async deleteUser(userId) {
+        const { error } = await supabase
+            .rpc('delete_user_by_admin', { user_id: userId })
+        if (error) throw error
+    },
+
     // Listen for auth state changes
     onAuthStateChange(callback) {
         return supabase.auth.onAuthStateChange(callback)
